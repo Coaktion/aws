@@ -1,0 +1,27 @@
+{
+    "env": {
+        "es2021": true,
+        "node": true
+    },
+    "extends": "standard-with-typescript",
+    "plugins": ["prettier"],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "project": "./tsconfig.json",
+        "sourceType": "module"
+    },
+    "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/space-before-function-paren": "off",
+        "prettier/prettier": [
+            "error",
+            {
+                "endOfLine": "auto",
+                "singleQuote": true,
+                "semi": false,
+                "tabWidth": 2,
+                "trailingComma": "none"
+            }
+        ]
+    }
+}
