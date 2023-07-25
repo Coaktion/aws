@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
     "test": "jest"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [],
   "author": "",
