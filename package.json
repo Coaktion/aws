@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "ts-node",
     "build": "tsc --project tsconfig.build.json",
