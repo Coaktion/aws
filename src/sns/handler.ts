@@ -1,7 +1,8 @@
 import {
-  PublishBatchCommand,
+  type PublishBatchCommandOutput,
   PublishCommand,
-  SNSClient
+  SNSClient,
+  PublishBatchCommand
 } from '@aws-sdk/client-sns'
 import {
   type SNSClientOptions,
@@ -45,12 +46,21 @@ export class SNSHandler {
       Subject: entry.subject
     }))
 
-    const command = new PublishBatchCommand({
-      PublishBatchRequestEntries: params,
-      TopicArn: topic
-    })
+    const response: PublishBatchCommandOutput[] = []
 
-    const response = await this.client.send(command)
+    while (params.length > 0) {
+      const batch = params.splice(0, 10)
+
+      const command = new PublishBatchCommand({
+        PublishBatchRequestEntries: batch,
+        TopicArn: topic
+      })
+
+      const batchResponse = await this.client.send(command)
+
+      response.push(batchResponse)
+    }
+
     return response
   }
 }

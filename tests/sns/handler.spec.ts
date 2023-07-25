@@ -72,5 +72,21 @@ describe('SNS Handler', () => {
         })
       )
     })
+
+    it('should split bulk publish into batches of 10', async () => {
+      handler.client.send = jest.fn()
+      const data = {
+        message: 'test'
+      }
+
+      const messages = Array.from({ length: 15 }, () => data)
+
+      await handler.bulkPublish(
+        'arn:aws:sns:us-east-1:000000000000:topic',
+        messages
+      )
+
+      expect(handler.client.send).toHaveBeenCalledTimes(2)
+    })
   })
 })
