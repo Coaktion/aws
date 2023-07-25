@@ -46,7 +46,7 @@ export class SNSHandler {
       Subject: entry.subject
     }))
 
-    const response: PublishBatchCommandOutput[] = []
+    const response: Array<Promise<PublishBatchCommandOutput>> = []
 
     while (params.length > 0) {
       const batch = params.splice(0, 10)
@@ -56,11 +56,11 @@ export class SNSHandler {
         TopicArn: topic
       })
 
-      const batchResponse = await this.client.send(command)
+      const batchResponse = this.client.send(command)
 
       response.push(batchResponse)
     }
 
-    return response
+    return await Promise.all(response)
   }
 }
