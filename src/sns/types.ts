@@ -1,4 +1,4 @@
-import { type ClientOptions } from 'src/common/client-options'
+import { type ClientOptions } from '../common/client-options'
 
 export interface SNSClientOptions extends ClientOptions {
   endpoint?: string
