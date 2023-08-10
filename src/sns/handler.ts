@@ -27,7 +27,8 @@ export class SNSHandler {
       MessageGroupId: options.messageGroupId,
       Subject: options.subject,
       PhoneNumber: options.phoneNumber,
-      TargetArn: options.targetArn
+      TargetArn: options.targetArn,
+      MessageDeduplicationId: options.messageDeduplicationId
     }
 
     const command = new PublishCommand(params)
@@ -43,6 +44,7 @@ export class SNSHandler {
       MessageAttributes: entry.messageAttributes,
       MessageStructure: entry.messageStructure,
       MessageGroupId: entry.messageGroupId,
+      MessageDeduplicationId: entry.messageDeduplicationId,
       Subject: entry.subject
     }))
 

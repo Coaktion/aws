@@ -13,6 +13,7 @@ export interface SNSPublishOptions {
   messageStructure?: string
   messageAttributes?: any
   messageGroupId?: string
+  messageDeduplicationId?: string
 }
 
 export interface SNSBulkEntry {
@@ -21,6 +22,7 @@ export interface SNSBulkEntry {
   messageStructure?: string
   messageAttributes?: any
   messageGroupId?: string
+  messageDeduplicationId?: string
 }
 
 export interface SNSBulkPublishOptions {
