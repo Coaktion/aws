@@ -17,9 +17,13 @@
     "access": "public",
     "registry": "https://npm.pkg.github.com/"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "SNS",
+    "AWS",
+    "typescript"
+  ],
+  "author": "Gustavo Inácio <gus.inacio@hotmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.3",
     "@types/node": "^20.4.2",
