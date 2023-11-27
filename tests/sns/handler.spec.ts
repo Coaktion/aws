@@ -18,6 +18,137 @@ describe('SNS Handler', () => {
     expect(handler).toBeDefined()
   })
 
+  describe('buildMessageAttributes', () => {
+    it.each([
+      ['test', 'String'],
+      [1, 'Number'],
+      [1.2, 'Number'],
+      [true, 'String'],
+      [{}, 'String'],
+      [[], 'String.Array'],
+      [new ArrayBuffer(1), 'Binary']
+    ])('should identify data type of %s as %s', (value, expected) => {
+      expect(handler.identifyDataType(value)).toBe(expected)
+    })
+
+    it.each([
+      ['test', 'StringValue'],
+      [1, 'NumberValue'],
+      [1.2, 'NumberValue'],
+      [true, 'StringValue'],
+      [{}, 'StringValue'],
+      [[], 'StringListValues'],
+      [new ArrayBuffer(1), 'BinaryValue']
+    ])('should adapt value of %s as %s', (value, expected) => {
+      expect(handler.identifyValue(value)).toBe(expected)
+    })
+
+    it.each([
+      [
+        { test: 'test' },
+        '"StringValue": "test"',
+        { test: { DataType: 'String', StringValue: 'test' } }
+      ],
+      [
+        { test: 1 },
+        '"NumberValue": 1',
+        { test: { DataType: 'Number', NumberValue: 1 } }
+      ],
+      [
+        { test: 1.2 },
+        '"NumberValue": 1.2',
+        { test: { DataType: 'Number', NumberValue: 1.2 } }
+      ],
+      [
+        { test: true },
+        '"StringValue": "true"',
+        { test: { DataType: 'String', StringValue: 'true' } }
+      ],
+      [
+        { test: {} },
+        '"StringValue": "{}"',
+        { test: { DataType: 'String', StringValue: {} } }
+      ],
+      [
+        { test: [] },
+        '"StringListValues": []',
+        { test: { DataType: 'String.Array', StringListValues: [] } }
+      ],
+      [
+        { test: new ArrayBuffer(1) },
+        '"BinaryValue": "<some binary>"',
+        { test: { DataType: 'Binary', BinaryValue: new ArrayBuffer(1) } }
+      ]
+    ])(
+      'should prepare message attributes of %s as %s',
+      (value, _, expected) => {
+        expect(handler.prepareMessageAttributes(value)).toEqual(expected)
+      }
+    )
+
+    it('should early return empty object if message attributes is empty', () => {
+      const spyIdentifyDataType = jest.spyOn(handler, 'identifyDataType')
+      const spyIdentifyValue = jest.spyOn(handler, 'identifyValue')
+      const spyAddaptValue = jest.spyOn(handler, 'addaptValue')
+
+      const result = handler.prepareMessageAttributes({})
+
+      expect(result).toEqual({})
+      expect(spyIdentifyDataType).not.toHaveBeenCalled()
+      expect(spyIdentifyValue).not.toHaveBeenCalled()
+      expect(spyAddaptValue).not.toHaveBeenCalled()
+    })
+
+    it('should build the message attributes with success', () => {
+      const attributes = {
+        string: 'test',
+        number: 1,
+        flaot: 1.2,
+        boolean: true,
+        object: {},
+        array: [],
+        binary: new ArrayBuffer(1)
+      }
+
+      const result = handler.buildMessageAttributes(attributes)
+
+      expect(result).toEqual({
+        string: {
+          DataType: 'String',
+          StringValue: attributes.string
+        },
+        number: {
+          DataType: 'Number',
+          NumberValue: attributes.number
+        },
+        flaot: {
+          DataType: 'Number',
+          NumberValue: attributes.flaot
+        },
+        boolean: {
+          DataType: 'String',
+          StringValue: attributes.boolean.toString()
+        },
+        object: {
+          DataType: 'String',
+          StringValue: {} // Will be converted to string in publish and bulkPublish methods
+        },
+        array: {
+          DataType: 'String.Array',
+          StringListValues: []
+        },
+        binary: {
+          DataType: 'Binary',
+          BinaryValue: new ArrayBuffer(1)
+        }
+      })
+    })
+
+    it('should return empty object if message attributes is undefined', () => {
+      expect(handler.buildMessageAttributes()).toEqual({})
+    })
+  })
+
   describe('publish', () => {
     it('should call publish method with correct params', async () => {
       handler.client.send = jest.fn()

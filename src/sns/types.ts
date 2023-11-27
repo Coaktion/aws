@@ -4,6 +4,14 @@ export interface SNSClientOptions extends ClientOptions {
   endpoint?: string
 }
 
+export interface SNSPublishMessageAttributes {
+  DataType: string
+  StringValue?: string
+  BinaryValue?: Uint8Array
+  StringListValues?: string[]
+  BinaryListValues?: Uint8Array[]
+}
+
 export interface SNSPublishOptions {
   topicArn: string
   message: any
@@ -11,7 +19,7 @@ export interface SNSPublishOptions {
   targetArn?: string
   subject?: string
   messageStructure?: string
-  messageAttributes?: any
+  messageAttributes?: Record<string, SNSPublishMessageAttributes>
   messageGroupId?: string
   messageDeduplicationId?: string
 }
@@ -20,7 +28,7 @@ export interface SNSBulkEntry {
   subject?: string
   message: any
   messageStructure?: string
-  messageAttributes?: any
+  messageAttributes?: Record<string, SNSPublishMessageAttributes>
   messageGroupId?: string
   messageDeduplicationId?: string
 }
