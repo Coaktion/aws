@@ -8,8 +8,6 @@ export interface SNSPublishMessageAttributes {
   DataType: string
   StringValue?: string
   BinaryValue?: Uint8Array
-  StringListValues?: string[]
-  BinaryListValues?: Uint8Array[]
 }
 
 export interface SNSPublishOptions {

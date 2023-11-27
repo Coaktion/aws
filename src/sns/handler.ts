@@ -42,28 +42,22 @@ export class SNSHandler {
   identifyValue(
     value: any
   ): keyof Partial<Omit<SNSPublishMessageAttributes, 'DataType'>> {
-    const type = typeof value
-
     if (value instanceof ArrayBuffer) return 'BinaryValue'
-    if (type === 'object') {
-      return Array.isArray(value) ? 'StringListValues' : 'StringValue'
-    }
 
-    const captalizedType = type[0].toUpperCase() + type.slice(1)
-    return UNSUPPORTED_TYPES.includes(type)
-      ? 'StringValue'
-      : (`${captalizedType}Value` as any)
+    return 'StringValue'
   }
 
   addaptValue(value: any) {
     const type = typeof value
-    if (UNSUPPORTED_TYPES.includes(type)) return value.toString()
 
-    return value
+    if (value instanceof ArrayBuffer) return value
+    if (type === 'object') return JSON.stringify(value)
+
+    return value.toString()
   }
 
   prepareMessageAttributes(messageAttributes: Record<string, any>) {
-    if (Object.keys(messageAttributes).length === 0) return {}
+    if (Object.keys(messageAttributes).length === 0) return undefined
     const attr: Record<string, SNSPublishMessageAttributes> = {}
 
     for (const [key, value] of Object.entries(messageAttributes)) {

@@ -33,11 +33,11 @@ describe('SNS Handler', () => {
 
     it.each([
       ['test', 'StringValue'],
-      [1, 'NumberValue'],
-      [1.2, 'NumberValue'],
+      [1, 'StringValue'],
+      [1.2, 'StringValue'],
       [true, 'StringValue'],
       [{}, 'StringValue'],
-      [[], 'StringListValues'],
+      [[], 'StringValue'],
       [new ArrayBuffer(1), 'BinaryValue']
     ])('should adapt value of %s as %s', (value, expected) => {
       expect(handler.identifyValue(value)).toBe(expected)
@@ -51,13 +51,13 @@ describe('SNS Handler', () => {
       ],
       [
         { test: 1 },
-        '"NumberValue": 1',
-        { test: { DataType: 'Number', NumberValue: 1 } }
+        '"StringValue": "1"',
+        { test: { DataType: 'Number', StringValue: '1' } }
       ],
       [
         { test: 1.2 },
-        '"NumberValue": 1.2',
-        { test: { DataType: 'Number', NumberValue: 1.2 } }
+        '"StringValue": "1.2"',
+        { test: { DataType: 'Number', StringValue: '1.2' } }
       ],
       [
         { test: true },
@@ -67,12 +67,12 @@ describe('SNS Handler', () => {
       [
         { test: {} },
         '"StringValue": "{}"',
-        { test: { DataType: 'String', StringValue: {} } }
+        { test: { DataType: 'String', StringValue: '{}' } }
       ],
       [
         { test: [] },
-        '"StringListValues": []',
-        { test: { DataType: 'String.Array', StringListValues: [] } }
+        '"StringValue": "[]"',
+        { test: { DataType: 'String.Array', StringValue: '[]' } }
       ],
       [
         { test: new ArrayBuffer(1) },
@@ -93,7 +93,7 @@ describe('SNS Handler', () => {
 
       const result = handler.prepareMessageAttributes({})
 
-      expect(result).toEqual({})
+      expect(result).toBeUndefined()
       expect(spyIdentifyDataType).not.toHaveBeenCalled()
       expect(spyIdentifyValue).not.toHaveBeenCalled()
       expect(spyAddaptValue).not.toHaveBeenCalled()
@@ -112,6 +112,8 @@ describe('SNS Handler', () => {
 
       const result = handler.buildMessageAttributes(attributes)
 
+      console.log(result)
+
       expect(result).toEqual({
         string: {
           DataType: 'String',
@@ -119,11 +121,11 @@ describe('SNS Handler', () => {
         },
         number: {
           DataType: 'Number',
-          NumberValue: attributes.number
+          StringValue: attributes.number.toString()
         },
         flaot: {
           DataType: 'Number',
-          NumberValue: attributes.flaot
+          StringValue: attributes.flaot.toString()
         },
         boolean: {
           DataType: 'String',
@@ -131,11 +133,11 @@ describe('SNS Handler', () => {
         },
         object: {
           DataType: 'String',
-          StringValue: {} // Will be converted to string in publish and bulkPublish methods
+          StringValue: JSON.stringify(attributes.object)
         },
         array: {
           DataType: 'String.Array',
-          StringListValues: []
+          StringValue: JSON.stringify(attributes.array)
         },
         binary: {
           DataType: 'Binary',
