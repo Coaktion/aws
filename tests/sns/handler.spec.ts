@@ -174,7 +174,6 @@ describe('SNS Handler', () => {
         test: { DataType: 'String', StringValue: 'test' }
       }
 
-      console.log(handler.needToConvert(attributes))
       const result = handler.buildMessageAttributes(attributes)
 
       expect(result).toEqual(attributes)
