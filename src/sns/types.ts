@@ -19,7 +19,7 @@ export interface SNSPublishOptions {
   targetArn?: string
   subject?: string
   messageStructure?: string
-  messageAttributes?: Record<string, SNSPublishMessageAttributes>
+  messageAttributes?: any
   messageGroupId?: string
   messageDeduplicationId?: string
 }
@@ -28,7 +28,7 @@ export interface SNSBulkEntry {
   subject?: string
   message: any
   messageStructure?: string
-  messageAttributes?: Record<string, SNSPublishMessageAttributes>
+  messageAttributes?: any
   messageGroupId?: string
   messageDeduplicationId?: string
 }
