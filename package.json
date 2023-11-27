@@ -11,6 +11,7 @@
     "start": "ts-node",
     "build": "tsc --project tsconfig.build.json",
     "test": "jest",
+    "test:watch": "jest --watch",
     "prepublishOnly": "npm run build"
   },
   "publishConfig": {

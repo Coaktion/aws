@@ -4,6 +4,12 @@ export interface SNSClientOptions extends ClientOptions {
   endpoint?: string
 }
 
+export interface SNSPublishMessageAttributes {
+  DataType: string
+  StringValue?: string
+  BinaryValue?: Uint8Array
+}
+
 export interface SNSPublishOptions {
   topicArn: string
   message: any
