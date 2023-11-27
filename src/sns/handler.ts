@@ -11,11 +11,6 @@ import {
   type SNSPublishMessageAttributes
 } from './types'
 import { randomUUID } from 'crypto'
-import {
-  MESSAGE_ATTRIBUTES,
-  MESSAGE_ATTRIBUTES_FALLBACK,
-  UNSUPPORTED_TYPES
-} from '../common/message-attributes'
 
 export class SNSHandler {
   client: SNSClient
@@ -28,49 +23,18 @@ export class SNSHandler {
     if (typeof messageAttributes !== 'object') return true
 
     const hasAnyInvalidAttributes = Object.values(messageAttributes).some(
-      (attr) => {
-        console.log(attr)
-        if (typeof attr !== 'object') return true
-
-        const type = attr.DataType
-        const strValue = attr.StringValue
-        const binaryValue = attr.BinaryValue
-
-        const isMissingAnyKey =
-          type === undefined ||
-          (strValue === undefined && binaryValue === undefined)
-
-        if (isMissingAnyKey) return true
-
-        const isAnyKeyInvalid =
-          typeof type !== 'string' ||
-          (typeof strValue !== 'string' &&
-            !(binaryValue instanceof ArrayBuffer))
-
-        if (isAnyKeyInvalid) {
-          throw new Error('Invalid message attributes')
-        }
-
-        return false
-      }
+      (attr) =>
+        typeof attr !== 'object' ||
+        attr.DataType === undefined ||
+        (attr.StringValue === undefined && attr.BinaryValue === undefined)
     )
 
     return hasAnyInvalidAttributes
   }
 
   identifyDataType(value: any) {
-    const type = typeof value
-
-    if (value instanceof ArrayBuffer) return MESSAGE_ATTRIBUTES.binary
-    if (type === 'object') {
-      return Array.isArray(value)
-        ? MESSAGE_ATTRIBUTES.object
-        : MESSAGE_ATTRIBUTES.string
-    }
-
-    return UNSUPPORTED_TYPES.includes(type)
-      ? MESSAGE_ATTRIBUTES_FALLBACK
-      : MESSAGE_ATTRIBUTES[type]
+    if (value instanceof ArrayBuffer) return 'Binary'
+    return 'String'
   }
 
   identifyValue(

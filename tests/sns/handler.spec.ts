@@ -45,22 +45,12 @@ describe('SNS Handler', () => {
     )
 
     it.each([
-      [{ test: { DataType: String, StringValue: 'test' } }],
-      [{ test: { DataType: null, StringValue: 'test' } }],
-      [{ test: { DataType: 'String', StringValue: 1 } }],
-      [{ test: { DataType: 'String', StringValue: {} } }],
-      [{ test: { DataType: 'String', StringValue: [] } }]
-    ])('should throw error if message attributes is invalid', (value) => {
-      expect(() => handler.needToConvert(value as any)).toThrowError()
-    })
-
-    it.each([
       ['test', 'String'],
-      [1, 'Number'],
-      [1.2, 'Number'],
+      [1, 'String'],
+      [1.2, 'String'],
       [true, 'String'],
       [{}, 'String'],
-      [[], 'String.Array'],
+      [[], 'String'],
       [new ArrayBuffer(1), 'Binary']
     ])('should identify data type of %s as %s', (value, expected) => {
       expect(handler.identifyDataType(value)).toBe(expected)
@@ -87,12 +77,12 @@ describe('SNS Handler', () => {
       [
         { test: 1 },
         '"StringValue": "1"',
-        { test: { DataType: 'Number', StringValue: '1' } }
+        { test: { DataType: 'String', StringValue: '1' } }
       ],
       [
         { test: 1.2 },
         '"StringValue": "1.2"',
-        { test: { DataType: 'Number', StringValue: '1.2' } }
+        { test: { DataType: 'String', StringValue: '1.2' } }
       ],
       [
         { test: true },
@@ -107,7 +97,7 @@ describe('SNS Handler', () => {
       [
         { test: [] },
         '"StringValue": "[]"',
-        { test: { DataType: 'String.Array', StringValue: '[]' } }
+        { test: { DataType: 'String', StringValue: '[]' } }
       ],
       [
         { test: new ArrayBuffer(1) },
@@ -153,11 +143,11 @@ describe('SNS Handler', () => {
           StringValue: attributes.string
         },
         number: {
-          DataType: 'Number',
+          DataType: 'String',
           StringValue: attributes.number.toString()
         },
         flaot: {
-          DataType: 'Number',
+          DataType: 'String',
           StringValue: attributes.flaot.toString()
         },
         boolean: {
@@ -169,7 +159,7 @@ describe('SNS Handler', () => {
           StringValue: JSON.stringify(attributes.object)
         },
         array: {
-          DataType: 'String.Array',
+          DataType: 'String',
           StringValue: JSON.stringify(attributes.array)
         },
         binary: {
