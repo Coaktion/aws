@@ -24,6 +24,40 @@ export class SNSHandler {
     this.client = new SNSClient(options)
   }
 
+  needToConvert(messageAttributes: Record<string, any>) {
+    if (typeof messageAttributes !== 'object') return true
+
+    const hasAnyInvalidAttributes = Object.values(messageAttributes).some(
+      (attr) => {
+        console.log(attr)
+        if (typeof attr !== 'object') return true
+
+        const type = attr.DataType
+        const strValue = attr.StringValue
+        const binaryValue = attr.BinaryValue
+
+        const isMissingAnyKey =
+          type === undefined ||
+          (strValue === undefined && binaryValue === undefined)
+
+        if (isMissingAnyKey) return true
+
+        const isAnyKeyInvalid =
+          typeof type !== 'string' ||
+          (typeof strValue !== 'string' &&
+            !(binaryValue instanceof ArrayBuffer))
+
+        if (isAnyKeyInvalid) {
+          throw new Error('Invalid message attributes')
+        }
+
+        return false
+      }
+    )
+
+    return hasAnyInvalidAttributes
+  }
+
   identifyDataType(value: any) {
     const type = typeof value
 
@@ -74,6 +108,7 @@ export class SNSHandler {
 
   buildMessageAttributes(messageAttributes?: Record<string, any>) {
     if (messageAttributes === undefined) return {}
+    if (!this.needToConvert(messageAttributes)) return messageAttributes
 
     return this.prepareMessageAttributes(messageAttributes)
   }

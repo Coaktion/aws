@@ -20,6 +20,41 @@ describe('SNS Handler', () => {
 
   describe('buildMessageAttributes', () => {
     it.each([
+      ['with only string', 'test', true],
+      ['with invalid SNS MessageAttributes', { test: 'test' }, true],
+      [
+        'with valid SNS MessageAttributes',
+        { test: { DataType: 'String', StringValue: 'test' } },
+        false
+      ],
+      [
+        'with invalid SNS MessageAttribute DataType',
+        { test: { DataType: undefined, StringValue: 'test' } },
+        true
+      ],
+      [
+        'with invalid SNS MessageAttribute StringValue',
+        { test: { DataType: 'String', StringValue: undefined } },
+        true
+      ]
+    ])(
+      'should check if need to convert message attributes %s',
+      (_, value, expected) => {
+        expect(handler.needToConvert(value as any)).toBe(expected)
+      }
+    )
+
+    it.each([
+      [{ test: { DataType: String, StringValue: 'test' } }],
+      [{ test: { DataType: null, StringValue: 'test' } }],
+      [{ test: { DataType: 'String', StringValue: 1 } }],
+      [{ test: { DataType: 'String', StringValue: {} } }],
+      [{ test: { DataType: 'String', StringValue: [] } }]
+    ])('should throw error if message attributes is invalid', (value) => {
+      expect(() => handler.needToConvert(value as any)).toThrowError()
+    })
+
+    it.each([
       ['test', 'String'],
       [1, 'Number'],
       [1.2, 'Number'],
@@ -112,8 +147,6 @@ describe('SNS Handler', () => {
 
       const result = handler.buildMessageAttributes(attributes)
 
-      console.log(result)
-
       expect(result).toEqual({
         string: {
           DataType: 'String',
@@ -144,6 +177,17 @@ describe('SNS Handler', () => {
           BinaryValue: new ArrayBuffer(1)
         }
       })
+    })
+
+    it('should return the original message attributes if no need to convert', () => {
+      const attributes = {
+        test: { DataType: 'String', StringValue: 'test' }
+      }
+
+      console.log(handler.needToConvert(attributes))
+      const result = handler.buildMessageAttributes(attributes)
+
+      expect(result).toEqual(attributes)
     })
 
     it('should return empty object if message attributes is undefined', () => {
